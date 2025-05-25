@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>InformAI - Your Personal Health Assistant</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f7fafc;
+        }
+        
+        .chat-container {
+            height: calc(100vh - 160px);
+        }
+        
+        .message-animation {
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .typing-indicator span {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: #4a5568;
+            margin: 0 2px;
+            animation: bounce 1.4s infinite ease-in-out;
+        }
+        
+        .typing-indicator span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+        
+        .typing-indicator span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+        
+        .symptom-chip {
+            transition: all 0.2s ease;
+        }
+        
+        .symptom-chip:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e0;
+            border-radius: 10px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #a0aec0;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <div class="container mx-auto max-w-6xl px-4 py-6">
+        <!-- Header -->
+        <header class="flex items-center justify-between mb-8">
+            <div class="flex items-center space-x-3">
+                <div class="bg-blue-600 text-white p-3 rounded-full">
+                    <i class="fas fa-robot text-xl"></i>
+                </div>
+                <h1 class="text-2xl font-bold text-gray-800">InformAI</h1>
+            </div>
+           
+        </header>
+        
+        <!-- Main Content -->
+        <div class="flex flex-col lg:flex-row gap-6">
+           
+            
+            <!-- Chat Area -->
+            <div class="w-full lg:w-2/3 bg-white rounded-xl shadow-sm overflow-hidden">
+                <div class="p-4 border-b border-gray-200 bg-blue-600 text-white">
+                    <div class="flex items-center space-x-3">
+                        <div class="bg-white text-blue-600 p-2 rounded-full">
+                            <i class="fas fa-robot"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-medium">InformAI</h3>
+                            <p class="text-xs opacity-80">Online</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="chat-container overflow-y-auto p-4" id="chat-messages">
+                    <!-- Welcome message -->
+                    <div class="message-animation mb-4">
+                        <div class="flex items-start space-x-3">
+                            <div class="bg-blue-100 text-blue-600 p-2 rounded-full">
+                                <i class="fas fa-robot"></i>
+                            </div>
+                            <div class="bg-blue-50 rounded-lg p-3 max-w-[80%]">
+                                <p class="text-gray-800">Hello! I'm InformAI, your personal health assistant. How can I help you today? You can describe your symptoms or ask about medications.</p>
+                                
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Sample conversation -->
+                    
+                    
+                    <!--<div class="message-animation mb-4">
+                        <div class="flex items-start space-x-3">
+                            <div class="bg-blue-100 text-blue-600 p-2 rounded-full">
+                                <i class="fas fa-robot"></i>
+                            </div>
+                            
+                        </div>
+                    </div>-->
+
+                    
+                    <!-- Typing indicator -->
+                    <div class="typing-indicator mb-4 hidden" id="typing-indicator">
+                        <div class="flex items-start space-x-3">
+                            <div class="bg-blue-100 text-blue-600 p-2 rounded-full">
+                                <i class="fas fa-robot"></i>
+                            </div>
+                            <div class="bg-blue-50 rounded-lg p-3 w-16">
+                                <div class="flex justify-center space-x-1">
+                                    <span></span>
+                                    <span></span>
+                                    <span></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Input Area -->
+                <div class="border-t border-gray-200 p-4 bg-gray-50">
+                    <div class="flex items-center space-x-2">
+                        <button class="text-gray-500 hover:text-gray-700 p-2 rounded-full hover:bg-gray-200">
+                            <i class="fas fa-paperclip"></i>
+                        </button>
+                        <div class="flex-grow relative">
+                            <input 
+                                type="text" 
+                                id="message-input" 
+                                placeholder="Type your message here..." 
+                                class="w-full bg-white border border-gray-300 rounded-full py-2 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            >
+                            <button class="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-blue-600">
+                                <i class="far fa-smile"></i>
+                            </button>
+                        </div>
+                        <button id="send-button" class="bg-blue-600 text-white p-2 rounded-full hover:bg-blue-700 transition">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
+                    <div class="mt-2 text-xs text-gray-500 text-center">
+                        <p>InformAI doesn't replace professional medical advice. In emergencies, call 112.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const messageInput = document.getElementById('message-input');
+            const sendButton = document.getElementById('send-button');
+            const chatMessages = document.getElementById('chat-messages');
+            const typingIndicator = document.getElementById('typing-indicator');
+            
+            // Sample responses for demo purposes
+            
+            
+            // Function to add a new message to the chat
+            function addMessage(text, isUser = false) {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `message-animation mb-4 ${isUser ? 'flex justify-end' : ''}`;
+                
+                const messageContent = `
+                    <div class="${isUser ? 'bg-gray-100' : 'bg-blue-50'} rounded-lg p-3 max-w-[80%]">
+                        <p class="text-gray-800">${text}</p>
+                        <p class="text-xs text-gray-500 mt-1 ${isUser ? 'text-right' : ''}">${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</p>
+                    </div>
+                `;
+                
+                if (!isUser) {
+                    messageDiv.innerHTML = `
+                        <div class="flex items-start space-x-3">
+                            <div class="bg-blue-100 text-blue-600 p-2 rounded-full">
+                                <i class="fas fa-robot"></i>
+                            </div>
+                            ${messageContent}
+                        </div>
+                    `;
+                } else {
+                    messageDiv.innerHTML = messageContent;
+                }
+                
+                chatMessages.appendChild(messageDiv);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
+            
+            // Function to simulate AI typing
+            function simulateTyping(callback) {
+                typingIndicator.classList.remove('hidden');
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+                
+                setTimeout(() => {
+                    typingIndicator.classList.add('hidden');
+                    callback();
+                }, 1500 + Math.random() * 2000); // Random delay between 1.5-3.5 seconds
+            }
+            
+            // Send message when button is clicked
+            sendButton.addEventListener('click', function() {
+                const message = messageInput.value.trim();
+                if (message) {
+                    addMessage(message, true);
+                    messageInput.value = '';
+                    
+                    simulateTyping(() => {
+                        const randomResponse = sampleResponses[Math.floor(Math.random() * sampleResponses.length)];
+                        addMessage(randomResponse);
+                    });
+                }
+            });
+            
+            // Send message when Enter is pressed
+            messageInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    sendButton.click();
+                }
+            });
+            
+            // Add click handlers to symptom chips
+            document.querySelectorAll('.symptom-chip').forEach(chip => {
+                chip.addEventListener('click', function() {
+                    const symptom = this.textContent.trim();
+                    messageInput.value = `I'm experiencing ${symptom.toLowerCase()}.`;
+                    messageInput.focus();
+                });
+            });
+            
+            // Add click handlers to quick action buttons
+            document.querySelectorAll('.bg-blue-50 button').forEach(button => {
+                button.addEventListener('click', function() {
+                    const action = this.querySelector('span').textContent.trim();
+                    let message = '';
+                    
+                    switch(action) {
+                        case 'Symptom Checker':
+                            message = "I'd like to check my symptoms.";
+                            break;
+                        case 'Medication Reminder':
+                            message = "Can you help me set up a medication reminder?";
+                            break;
+                        case 'Appointment Scheduler':
+                            message = "I need to schedule a doctor's appointment.";
+                            break;
+                        case 'Health Records':
+                            message = "Can you show me my health records?";
+                            break;
+                    }
+                    
+                    addMessage(message, true);
+                    
+                    simulateTyping(() => {
+                        let response = "";
+                        if (action === 'Symptom Checker') {
+                            response = "Of course! Please describe your symptoms in detail, including when they started, their severity, and any factors that make them better or worse.";
+                        } else if (action === 'Medication Reminder') {
+                            response = "I can help with that. What medication would you like reminders for, and what's your preferred schedule?";
+                        } else if (action === 'Appointment Scheduler') {
+                            response = "I can assist with scheduling. Would you like to see your primary care physician or a specialist? What's your preferred date and time?";
+                        } else if (action === 'Health Records') {
+                            response = "Here's an overview of your recent health records. Would you like to see specific test results or visit summaries?";
+                        }
+                        
+                        addMessage(response);
+                    });
+                });
+            });
+        });
+    </script>
+</body>
+</html>
