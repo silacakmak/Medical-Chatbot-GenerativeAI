@@ -194,7 +194,7 @@
             
             
             // Function to add a new message to the chat
-            function addMessage(text, isUser = false) {
+            function addMessage(text, isUser = true) {
                 const messageDiv = document.createElement('div');
                 messageDiv.className = `message-animation mb-4 ${isUser ? 'flex justify-end' : ''}`;
                 
@@ -233,16 +233,31 @@
                 }, 1500 + Math.random() * 2000); // Random delay between 1.5-3.5 seconds
             }
             
+            // Function to send message to backend
+            async function sendMessageToBackend(message) {
+                try {
+                    const response = await fetch('http://localhost:5000/chat', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ message })
+                    });
+                    const data = await response.json();
+                    addMessage(data.response, false);
+                } catch (error) {
+                    addMessage('Bir hata oluştu. Lütfen tekrar deneyin.', false);
+                }
+            }
+            
             // Send message when button is clicked
             sendButton.addEventListener('click', function() {
                 const message = messageInput.value.trim();
                 if (message) {
                     addMessage(message, true);
                     messageInput.value = '';
-                    
                     simulateTyping(() => {
-                        const randomResponse = sampleResponses[Math.floor(Math.random() * sampleResponses.length)];
-                        addMessage(randomResponse);
+                        sendMessageToBackend(message);
                     });
                 }
             });
@@ -306,3 +321,5 @@
     </script>
 </body>
 </html>
+<!-- kullanıcı girişi bulunamayan textten en yakın tahmini cevap -->
+ 

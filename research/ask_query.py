@@ -1,6 +1,6 @@
 # ask_query.py
 
-from weaviate_config import connect_to_weaviate, initialize_embeddings
+from research.weaviate_config import connect_to_weaviate, initialize_embeddings
 import openai
 from openai import OpenAI
 import os
@@ -206,6 +206,23 @@ def ask_medical_question():
 
     client.close()
     weaviate_client.close()
+
+def answer_user_question(query, use_gemini=True):
+    """
+    Kullanıcıdan gelen soruya en uygun cevabı döndürür.
+    1. Soru için embedding oluşturur.
+    2. Weaviate'den en yakın context'i bulur.
+    3. AI'dan cevap alır.
+    """
+    vector = embeddings.embed_query(query)
+    results = collection.query.near_vector(near_vector=vector, limit=1)
+    if results and results.objects:
+        obj = results.objects[0]
+        context = obj.properties.get('content', '')
+        answer = get_ai_response(query, context, use_gemini)
+        return answer
+    else:
+        return "Bu soru için uygun bir kaynak bulunamadı."
 
 if __name__ == "__main__":
     ask_medical_question()
